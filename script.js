@@ -71,6 +71,7 @@ function createTiles() {
 createTiles();
 document.addEventListener("keydown", handleKeyPress);
 
+WORD = localStorage.getItem('wordleWord')
 fetch(`${URL}/getword`)
     .then(response => response.json())
     .then(data => {
