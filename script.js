@@ -4,10 +4,16 @@ const URL = "http://localhost:3000";
 const board = document.getElementById("game-board");
 let currentRow = 0;
 let currentGuess = "";
+let gameOver = false;
 
 function handleKeyPress(e) {
+  if (gameOver) {
+      return;
+  }
   if (e.key === "Enter") {
     if (currentGuess.length === 5) checkGuess(WORD);
+    if (currentGuess === WORD.toUpperCase()) gameOver = true;
+    currentGuess = "";
   } else if (e.key === "Backspace") {
     if (currentGuess.length > 0) {
       currentGuess = currentGuess.slice(0, -1);
@@ -27,6 +33,20 @@ function updateTile() {
   }
 }
 
+// function makeGuess() {
+//   if (gameOver) return;
+//   const guess = document.getElementById("guessInput").value.toLowerCase();
+//   if (guess.length !== wordLength) return alert("Word must be " + wordLength + " letters.");
+//   attempts.push(guess);
+//   document.getElementById("guessInput").value = "";
+//   renderBoard();
+//
+//   if (guess === secretWord) {
+//     gameOver = true;
+//     setTimeout(() => alert("Congratulations! You guessed the word!"), 100);
+//   }
+// }
+
 function checkGuess(word) {
   word = word.toUpperCase();
   const start = currentRow * 5;
@@ -38,7 +58,6 @@ function checkGuess(word) {
     else tile.classList.add("absent");
   }
   currentRow++;
-  currentGuess = "";
 }
 
 function createTiles() {
