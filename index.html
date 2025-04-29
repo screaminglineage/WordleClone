@@ -1,13 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Wordle Clone</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Word Submit</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #1e1e1e;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 100px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #2c2c2c;
+      color: #fff;
+    }
+
+    input[type="submit"] {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
-  <h1>Wordle Clone</h1>
-  <div id="game-board"></div>
-  <div id="keyboard"></div>
-  <script src="script.js"></script>
+  <div class="container">
+  <form id="wordForm">
+      <input type="text" name="word" maxlength="5" pattern="[A-Za-z]{5}" required placeholder="Enter 5-letter word">
+      <input type="submit" value="Submit">
+    </form>
+  </div>
 </body>
+<script>
+    localStorage.removeItem('wordleWord');
+    const sessionId = Math.random().toString(36).substring(2, 10);
+    document.getElementById('wordForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const wordForm = document.getElementById('wordForm');
+        const word = Object.fromEntries(new FormData(wordForm)).word;
+
+        fetch('/submitword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ word, id: sessionId })
+        })
+            .then(() => {
+                alert('Submitted! Waiting for other player...');
+                pollForRedirect();
+            });
+
+        function pollForRedirect() {
+            const interval = setInterval(() => {
+                fetch(`/ready?id=${sessionId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data);
+                        if (data.ready && data.words) {
+                            console.log('Other player submitted:', data);
+                            clearInterval(interval);
+                            console.log(data)
+                            localStorage.setItem('wordleWord', data.words);
+                            window.location.href = '/results';
+                        }
+                    });
+            }, 2000);
+        }
+    });
+
+</script>
 </html>
+
