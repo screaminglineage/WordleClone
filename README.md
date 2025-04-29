@@ -10,4 +10,9 @@ A wordle clone with multiplayer support (pretty scuffed right now, was literally
 - add a menu to select singleplayer/multiplayer
 - customize the word length (?)
 
+## Running
+
+```console
+$ node backend.js
+```
 
